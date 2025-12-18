@@ -100,6 +100,34 @@ A robust token management system that maintains exactly 100 pre-generated UUID t
 
 ### 3. Supervised Process Layer
 
+#### Implementation Approach: Periodic Job (Approach #3)
+
+**Chosen Approach**: A supervised process (GenServer) runs a periodic job that checks for and releases expired tokens.
+
+**Why This Approach:**
+- ✅ **Reliability**: Single supervised process, easy to monitor and restart
+- ✅ **Simplicity**: One process, one timer, straightforward logic
+- ✅ **Efficiency**: Batch processing of expired tokens
+- ✅ **Database-Driven**: Single source of truth (database timestamps)
+- ✅ **Scalability**: Works well even with 100 tokens
+- ✅ **Maintainability**: Easy to debug and reason about
+
+**Alternative Approaches Considered:**
+
+1. **Supervised process maintaining list** (Approach #1)
+   - ❌ More complex state management
+   - ❌ Need to rebuild state on crash
+   - ❌ Memory overhead for tracking all tokens
+   - ✅ More precise timing per token
+
+2. **Per-token scheduled jobs** (Approach #2)
+   - ❌ Up to 100 concurrent timers/jobs
+   - ❌ Complex failure handling (what if job crashes?)
+   - ❌ More moving parts to manage
+   - ✅ Most precise timing per token
+
+**Our Choice**: Periodic job strikes the best balance between simplicity, reliability, and precision.
+
 #### GenServer: `JustTravelTest.Tokens.Manager`
 
 **Purpose**: Monitor and auto-release tokens based on time limits
@@ -114,13 +142,20 @@ A robust token management system that maintains exactly 100 pre-generated UUID t
 - `schedule_next_check/1` - Schedule next periodic check
 
 **Behavior:**
-- Runs periodic check every 30 seconds (configurable)
-- Finds tokens active > 2 minutes
-- Releases them automatically
-- Handles GenServer lifecycle
+- Runs periodic check every 30 seconds (configurable, can be reduced for better precision)
+- Finds tokens where `activated_at < (now - 2 minutes)`
+- Releases them automatically in batch
+- Handles GenServer lifecycle and crashes gracefully
+
+**Precision Note**: 
+- Check interval of 30 seconds means tokens are released within 2:00-2:30 minutes
+- Can be reduced to 10-15 seconds for better precision (2:00-2:15 minutes)
+- Trade-off: More frequent database queries vs. better precision
 
 #### Integration with Application Supervisor
 - Add `JustTravelTest.Tokens.Manager` to `application.ex` children
+- Automatically restarts on failure
+- Part of application supervision tree
 
 ### 4. Business Logic Flow
 
@@ -356,8 +391,15 @@ Add to `config/config.exs`:
 config :just_travel_test, JustTravelTest.Tokens,
   max_active_tokens: 100,
   token_lifetime_minutes: 2,
-  check_interval_seconds: 30
+  check_interval_seconds: 30  # Can be reduced to 10-15 for better precision
 ```
+
+**Configuration Notes:**
+- `check_interval_seconds`: Controls how often we check for expired tokens
+  - Lower value = better precision (tokens released closer to 2:00 mark)
+  - Higher value = fewer database queries (tokens released within 2:00-2:30 range)
+  - Default: 30 seconds (good balance)
+  - Recommended for production: 10-15 seconds (better precision, still efficient)
 
 ## Error Handling
 
@@ -371,8 +413,12 @@ config :just_travel_test, JustTravelTest.Tokens,
 
 - Use database indexes for efficient queries
 - Batch operations when possible
+- Periodic job uses indexed query (`activated_at` index) for fast expiration checks
 - Consider using `:ets` for in-memory tracking if needed (future optimization)
 - Use database-level locking for atomic operations
+- Check interval balances precision vs. database load:
+  - 30 seconds: ~2 queries/minute for expiration checks
+  - 10 seconds: ~6 queries/minute (still very efficient)
 
 ## Future Enhancements
 
