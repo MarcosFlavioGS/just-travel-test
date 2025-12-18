@@ -9,3 +9,25 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias JustTravelTest.Repo
+alias JustTravelTest.Schemas.Token
+
+# Generate 100 unique UUID tokens
+IO.puts("Generating 100 tokens...")
+
+tokens =
+  1..100
+  |> Enum.map(fn _ ->
+    %{
+      id: Ecto.UUID.generate(),
+      state: :available,
+      inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+      updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+    }
+  end)
+
+# Insert all tokens in batches for efficiency
+Repo.insert_all(Token, tokens)
+
+IO.puts("✓ Successfully created 100 tokens")
