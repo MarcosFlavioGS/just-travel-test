@@ -12,8 +12,7 @@ defmodule JustTravelTest.Application do
       JustTravelTest.Repo,
       {DNSCluster, query: Application.get_env(:just_travel_test, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: JustTravelTest.PubSub},
-      # Start a worker by calling: JustTravelTest.Worker.start_link(arg)
-      # {JustTravelTest.Worker, arg},
+      JustTravelTest.Tokens.Manager,
       # Start to serve requests, typically the last entry
       JustTravelTestWeb.Endpoint
     ]
