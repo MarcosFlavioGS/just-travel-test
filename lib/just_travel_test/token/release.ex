@@ -45,6 +45,7 @@ defmodule JustTravelTest.Tokens.Release do
         end)
         |> case do
           {:ok, token} -> {:ok, token}
+          {:error, {:error, reason}} -> {:error, reason}
           {:error, reason} -> {:error, reason}
         end
 
@@ -87,10 +88,14 @@ defmodule JustTravelTest.Tokens.Release do
   def release_oldest_active_token do
     case get_oldest_active_token() do
       nil ->
-        :ok
+        {:error, :no_active_tokens}
 
       token ->
         release_token(token.id)
+        |> case do
+          {:ok, _token} -> {:ok, token.id}
+          error -> error
+        end
     end
   end
 
