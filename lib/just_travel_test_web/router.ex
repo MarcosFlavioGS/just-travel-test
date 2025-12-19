@@ -7,6 +7,12 @@ defmodule JustTravelTestWeb.Router do
 
   scope "/api", JustTravelTestWeb do
     pipe_through :api
+
+    post "/tokens/activate", TokenController, :activate
+    get "/tokens", TokenController, :index
+    get "/tokens/:token_id", TokenController, :show
+    get "/tokens/:token_id/usages", TokenController, :usages
+    delete "/tokens/active", TokenController, :clear_active
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
