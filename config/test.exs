@@ -1,5 +1,12 @@
 import Config
 
+# Token management configuration for tests
+# Use shorter lifetime and more frequent checks for faster, more reliable tests
+config :just_travel_test, JustTravelTest.Tokens,
+  max_active_tokens: 100,
+  token_lifetime_minutes: 1,  # 1 minute for faster test execution
+  check_interval_seconds: 10  # Check every 10 seconds in tests
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
