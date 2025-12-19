@@ -39,6 +39,12 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Token management configuration
+config :just_travel_test, JustTravelTest.Tokens,
+  max_active_tokens: 100,
+  token_lifetime_minutes: 2,
+  check_interval_seconds: 30
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
