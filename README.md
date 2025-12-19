@@ -20,7 +20,7 @@ Este projeto implementa um sistema robusto de gerenciamento de tokens que manté
 
 A documentação completa do projeto está disponível em:
 
-**[📖 Ver Documentação Completa](./docs/index.html)**
+**[📖 Ver Documentação Completa](https://marcosflaviogs.github.io/just-travel-test/)**
 
 A documentação inclui:
 - Referência completa da API
@@ -96,7 +96,7 @@ Para mais detalhes sobre a API, consulte a [Documentação da API](./doc/API_DOC
 
 - [Documentação da API](./doc/API_DOCUMENTATION.md) - Guia completo dos endpoints
 - [Plano do Sistema de Tokens](./TOKEN_SYSTEM_PLAN.md) - Arquitetura e design
-- [Documentação do Código](./docs/index.html) - Referência completa gerada pelo ExDoc
+- [Documentação do Código](https://marcosflaviogs.github.io/just-travel-test/) - Referência completa gerada pelo ExDoc
 
 ## 🏗️ Estrutura do Projeto
 
