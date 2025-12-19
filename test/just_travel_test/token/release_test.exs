@@ -161,7 +161,6 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
       TokenFactory.create_tokens(3, state: :available)
 
       # Get initial counts (accounting for any existing tokens)
-      initial_active = Tokens.count_active_tokens()
       initial_available = Tokens.count_available_tokens()
 
       assert {:ok, cleared_count} = Tokens.clear_all_active_tokens()

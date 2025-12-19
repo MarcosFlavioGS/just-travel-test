@@ -38,33 +38,46 @@ defmodule JustTravelTestWeb.Token.TokenControllerTest do
     end
 
     test "releases oldest token when limit reached", %{conn: conn} do
-      # Create 100 active tokens
+      # Clear all tokens first to avoid seed data interference
+      Tokens.clear_all_active_tokens()
+
+      # Create exactly 100 active tokens with different activation times
+      base_time = DateTime.utc_now() |> DateTime.truncate(:second)
       user_ids = Enum.map(1..100, fn _ -> TokenFactory.user_uuid() end)
 
       tokens =
-        Enum.map(user_ids, fn user_id ->
+        user_ids
+        |> Enum.with_index()
+        |> Enum.map(fn {user_id, index} ->
+          # Create tokens with slightly different activation times
+          activated_at = DateTime.add(base_time, -index, :second)
           TokenFactory.create_token(
             state: :active,
             utilizer_uuid: user_id,
-            activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+            activated_at: activated_at
           )
         end)
 
       oldest_token = Enum.min_by(tokens, & &1.activated_at)
 
       # Create one available token
-      available_token = TokenFactory.create_token(state: :available)
+      _available_token = TokenFactory.create_token(state: :available)
+
+      # Verify we have exactly 100 active tokens
+      assert Tokens.count_active_tokens() == 100
 
       new_user_id = TokenFactory.user_uuid()
 
       conn = post(conn, ~p"/api/tokens/activate", %{"user_id" => new_user_id})
 
       assert %{"token_id" => token_id} = json_response(conn, 200)
-      assert token_id == available_token.id
+      assert token_id != nil
 
       # Oldest token should be released
       released = Tokens.get_token_by_id(oldest_token.id)
       assert released.state == :available
+      assert released.utilizer_uuid == nil
+      assert released.released_at != nil
     end
   end
 

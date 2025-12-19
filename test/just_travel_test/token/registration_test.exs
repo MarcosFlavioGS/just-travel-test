@@ -35,15 +35,24 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
     end
 
     test "releases oldest active token when limit is reached" do
-      # Create 100 active tokens
+      # Clear all tokens first to avoid seed data interference
+      Tokens.clear_all_active_tokens()
+
+      # Create exactly 100 active tokens with different activation times
+      base_time = DateTime.utc_now() |> DateTime.truncate(:second)
+
       user_ids = Enum.map(1..100, fn _ -> TokenFactory.user_uuid() end)
 
       tokens =
-        Enum.map(user_ids, fn user_id ->
+        user_ids
+        |> Enum.with_index()
+        |> Enum.map(fn {user_id, index} ->
+          # Create tokens with slightly different activation times
+          activated_at = DateTime.add(base_time, -index, :second)
           TokenFactory.create_token(
             state: :active,
             utilizer_uuid: user_id,
-            activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+            activated_at: activated_at
           )
         end)
 
@@ -51,7 +60,10 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
       oldest_token = Enum.min_by(tokens, & &1.activated_at)
 
       # Create one available token
-      available_token = TokenFactory.create_token(state: :available)
+      _available_token = TokenFactory.create_token(state: :available)
+
+      # Verify we have exactly 100 active tokens
+      assert Tokens.count_active_tokens() == 100
 
       # Try to activate a new token (should release oldest)
       new_user_id = TokenFactory.user_uuid()
@@ -75,8 +87,11 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
     end
 
     test "handles concurrent activation requests" do
-      # Create 5 available tokens
-      TokenFactory.create_tokens(5, state: :available)
+      # Clear all tokens first to avoid seed data interference
+      Tokens.clear_all_active_tokens()
+
+      # Create 10 available tokens (enough for all concurrent requests)
+      TokenFactory.create_tokens(10, state: :available)
 
       # Simulate concurrent requests
       user_ids = Enum.map(1..10, fn _ -> TokenFactory.user_uuid() end)
@@ -108,8 +123,8 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
 
       assert successful == length(user_ids)
 
-      # Should have at least 5 active tokens (we had 5 available, plus any from seeds)
-      assert Tokens.count_active_tokens() >= 5
+      # Should have exactly 10 active tokens (we created 10 available and activated 10)
+      assert Tokens.count_active_tokens() == 10
     end
 
     test "creates usage history record on activation" do

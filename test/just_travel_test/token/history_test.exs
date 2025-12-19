@@ -17,10 +17,12 @@ defmodule JustTravelTest.Tokens.HistoryTest do
       # First usage - should get our token since it's the only available one
       {:ok, result1} = Tokens.register_token_usage(user1)
       assert result1.token_id == token.id
+
       {:ok, _} = Tokens.release_token(token.id)
 
-      # Small delay to ensure different timestamps
-      Process.sleep(10)
+      # Wait at least 1 second to ensure different timestamps (since we truncate to seconds)
+      # Add a small buffer to be safe
+      Process.sleep(1100)
 
       # Second usage - should get our token again
       {:ok, result2} = Tokens.register_token_usage(user2)
@@ -38,6 +40,10 @@ defmodule JustTravelTest.Tokens.HistoryTest do
       user_ids = Enum.map(history, & &1.user_id)
       assert user1 in user_ids
       assert user2 in user_ids
+
+      # Verify ordering: first_usage should be more recent than second_usage
+      comparison = DateTime.compare(first_usage.started_at, second_usage.started_at)
+      assert comparison == :gt, "Expected first_usage to be more recent, but timestamps are: first=#{inspect(first_usage.started_at)}, second=#{inspect(second_usage.started_at)}"
 
       # The first usage should be the most recent (user2, not ended)
       assert first_usage.user_id == user2
