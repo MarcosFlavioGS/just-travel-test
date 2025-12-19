@@ -20,7 +20,7 @@ Este projeto implementa um sistema robusto de gerenciamento de tokens que manté
 
 A documentação completa do projeto está disponível em:
 
-**[📖 Ver Documentação Completa](./doc/index.html)**
+**[📖 Ver Documentação Completa](./docs/index.html)**
 
 A documentação inclui:
 - Referência completa da API
@@ -90,13 +90,13 @@ GET /api/tokens/:token_id/usages
 DELETE /api/tokens/active
 ```
 
-Para mais detalhes sobre a API, consulte a [Documentação da API](./docs/API_DOCUMENTATION.md).
+Para mais detalhes sobre a API, consulte a [Documentação da API](./doc/API_DOCUMENTATION.md).
 
 ## 📖 Documentação Adicional
 
-- [Documentação da API](./docs/API_DOCUMENTATION.md) - Guia completo dos endpoints
+- [Documentação da API](./doc/API_DOCUMENTATION.md) - Guia completo dos endpoints
 - [Plano do Sistema de Tokens](./TOKEN_SYSTEM_PLAN.md) - Arquitetura e design
-- [Documentação do Código](./doc/index.html) - Referência completa gerada pelo ExDoc
+- [Documentação do Código](./docs/index.html) - Referência completa gerada pelo ExDoc
 
 ## 🏗️ Estrutura do Projeto
 
