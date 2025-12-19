@@ -18,15 +18,15 @@ defmodule JustTravelTest.Tokens do
   defdelegate release_oldest_active_token(), to: JustTravelTest.Tokens.Release
   defdelegate clear_all_active_tokens(), to: JustTravelTest.Tokens.Release
 
-  defdelegate list_all_tokens(), to: JustTravelTest.Tokens.Queries
+  defdelegate list_all_tokens(opts \\ []), to: JustTravelTest.Tokens.Queries
   defdelegate list_available_tokens(), to: JustTravelTest.Tokens.Queries
-  defdelegate list_active_tokens(), to: JustTravelTest.Tokens.Queries
-  defdelegate get_token_by_id(token_id), to: JustTravelTest.Tokens.Queries
+  defdelegate list_active_tokens(opts \\ []), to: JustTravelTest.Tokens.Queries
+  defdelegate get_token_by_id(token_id, opts \\ []), to: JustTravelTest.Tokens.Queries
   defdelegate get_token_by_user(user_id), to: JustTravelTest.Tokens.Queries
   defdelegate count_active_tokens(), to: JustTravelTest.Tokens.Queries
   defdelegate count_available_tokens(), to: JustTravelTest.Tokens.Queries
 
-  defdelegate get_token_usage_history(token_id), to: JustTravelTest.Tokens.History
+  defdelegate get_token_usage_history(token_id, opts \\ []), to: JustTravelTest.Tokens.History
 
   defdelegate find_expired_tokens(), to: JustTravelTest.Tokens.Expiration
   defdelegate release_expired_tokens(), to: JustTravelTest.Tokens.Expiration

@@ -8,10 +8,33 @@ defmodule JustTravelTest.Tokens.Queries do
 
   @doc """
   Lists all tokens with their current state.
+
+  Optionally includes usage counts via preload.
   """
-  def list_all_tokens do
-    from(t in TokenSchema, order_by: [asc: t.id])
-    |> Repo.all()
+  def list_all_tokens(opts \\ [])
+
+  def list_all_tokens(opts) do
+    query = from(t in TokenSchema, order_by: [asc: t.id])
+
+    if Keyword.get(opts, :with_usage_count, false) do
+      # Use a join to get usage counts efficiently
+      from(t in query,
+        left_join: usage in assoc(t, :token_usages),
+        group_by: [t.id],
+        select: %{
+          token: t,
+          usage_count: count(usage.id)
+        }
+      )
+      |> Repo.all()
+      |> Enum.map(fn %{token: token, usage_count: count} ->
+        token
+        |> Map.from_struct()
+        |> Map.put(:usage_count, count)
+      end)
+    else
+      Repo.all(query)
+    end
   end
 
   @doc """
@@ -24,23 +47,84 @@ defmodule JustTravelTest.Tokens.Queries do
 
   @doc """
   Lists all active tokens.
+
+  Optionally includes usage counts via preload.
   """
-  def list_active_tokens do
-    from(t in TokenSchema, where: t.state == :active, order_by: [asc: t.activated_at])
-    |> Repo.all()
+  def list_active_tokens(opts \\ [])
+
+  def list_active_tokens(opts) do
+    query = from(t in TokenSchema, where: t.state == :active, order_by: [asc: t.activated_at])
+
+    if Keyword.get(opts, :with_usage_count, false) do
+      # Use a join to get usage counts efficiently
+      from(t in query,
+        left_join: usage in assoc(t, :token_usages),
+        group_by: [t.id],
+        select: %{
+          token: t,
+          usage_count: count(usage.id)
+        }
+      )
+      |> Repo.all()
+      |> Enum.map(fn %{token: token, usage_count: count} ->
+        token
+        |> Map.from_struct()
+        |> Map.put(:usage_count, count)
+      end)
+    else
+      Repo.all(query)
+    end
   end
 
   @doc """
   Gets a token by its ID.
+
+  Optionally preloads token_usages if needed.
   """
-  def get_token_by_id(token_id) when is_binary(token_id) do
+  def get_token_by_id(token_id, opts \\ [])
+
+  def get_token_by_id(token_id, opts) when is_binary(token_id) do
     case Ecto.UUID.cast(token_id) do
-      {:ok, _uuid} -> Repo.get(TokenSchema, token_id)
-      :error -> nil
+      {:ok, _uuid} ->
+        query = TokenSchema |> where([t], t.id == ^token_id)
+
+        query =
+          if Keyword.get(opts, :preload_usage_count, false) do
+            # Use a join to get usage count in a single query
+            from(t in query,
+              left_join: usage in assoc(t, :token_usages),
+              group_by: [t.id],
+              select: %{
+                token: t,
+                usage_count: count(usage.id)
+              }
+            )
+          else
+            query
+          end
+
+        result = Repo.one(query)
+
+        case result do
+          %{token: token, usage_count: count} ->
+            # Add usage_count as a map field (not a struct field)
+            token
+            |> Map.from_struct()
+            |> Map.put(:usage_count, count)
+
+          token when is_struct(token) ->
+            token
+
+          _ ->
+            nil
+        end
+
+      :error ->
+        nil
     end
   end
 
-  def get_token_by_id(_), do: nil
+  def get_token_by_id(_, _), do: nil
 
   @doc """
   Gets the active token for a user.

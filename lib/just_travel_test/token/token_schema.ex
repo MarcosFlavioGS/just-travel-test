@@ -18,6 +18,8 @@ defmodule JustTravelTest.Token.TokenSchema do
     field :activated_at, :utc_datetime
     field :released_at, :utc_datetime
 
+    has_many :token_usages, JustTravelTest.Token.TokenUsageSchema, foreign_key: :token_id
+
     timestamps(type: :utc_datetime)
   end
 
