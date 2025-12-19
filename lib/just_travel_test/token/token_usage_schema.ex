@@ -1,4 +1,4 @@
-defmodule JustTravelTest.Schemas.TokenUsage do
+defmodule JustTravelTest.Token.TokenUsageSchema do
   @moduledoc """
   TokenUsage schema tracking the history of token usage.
 
@@ -17,7 +17,7 @@ defmodule JustTravelTest.Schemas.TokenUsage do
     field :started_at, :utc_datetime
     field :ended_at, :utc_datetime
 
-    belongs_to :token, JustTravelTest.Schemas.Token, foreign_key: :token_id
+    belongs_to :token, JustTravelTest.Token.TokenSchema, foreign_key: :token_id
 
     timestamps(type: :utc_datetime)
   end

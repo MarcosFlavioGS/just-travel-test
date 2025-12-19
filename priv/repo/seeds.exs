@@ -11,7 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias JustTravelTest.Repo
-alias JustTravelTest.Schemas.Token
+alias JustTravelTest.Token.TokenSchema
 
 # Generate 100 unique UUID tokens
 IO.puts("Generating 100 tokens...")
@@ -28,6 +28,6 @@ tokens =
   end)
 
 # Insert all tokens in batches for efficiency
-Repo.insert_all(Token, tokens)
+Repo.insert_all(TokenSchema, tokens)
 
 IO.puts("✓ Successfully created 100 tokens")

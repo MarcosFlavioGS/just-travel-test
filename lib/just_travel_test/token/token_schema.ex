@@ -1,4 +1,4 @@
-defmodule JustTravelTest.Schemas.Token do
+defmodule JustTravelTest.Token.TokenSchema do
   @moduledoc """
   Token schema representing one of the 100 pre-generated tokens.
 
