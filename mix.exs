@@ -10,7 +10,11 @@ defmodule JustTravelTest.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+
+      docs: [
+      output: "docs"
+    ]
     ]
   end
 
