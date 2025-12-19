@@ -7,7 +7,11 @@ defmodule JustTravelTest.Tokens.Expiration do
   alias JustTravelTest.Token.TokenSchema
   alias JustTravelTest.Token.TokenUsageSchema
 
-  @token_lifetime_minutes Application.compile_env(:just_travel_test, [JustTravelTest.Tokens, :token_lifetime_minutes], 2)
+  @token_lifetime_minutes Application.compile_env(
+                            :just_travel_test,
+                            [JustTravelTest.Tokens, :token_lifetime_minutes],
+                            2
+                          )
 
   @doc """
   Finds tokens that have been active for more than the configured lifetime.

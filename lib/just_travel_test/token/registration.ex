@@ -9,7 +9,11 @@ defmodule JustTravelTest.Tokens.Registration do
   alias JustTravelTest.Tokens.Release
   alias JustTravelTest.Tokens.Queries
 
-  @max_active_tokens Application.compile_env(:just_travel_test, [JustTravelTest.Tokens, :max_active_tokens], 100)
+  @max_active_tokens Application.compile_env(
+                       :just_travel_test,
+                       [JustTravelTest.Tokens, :max_active_tokens],
+                       100
+                     )
 
   @doc """
   Registers a token for use by a user.

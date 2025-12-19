@@ -38,16 +38,20 @@ defmodule JustTravelTest.Tokens.QueriesTest do
 
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
-      token1 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user1,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
-      token2 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user2,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      token1 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user1,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
+
+      token2 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user2,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       available = Tokens.list_available_tokens()
       # Account for any existing tokens from seeds
@@ -71,16 +75,21 @@ defmodule JustTravelTest.Tokens.QueriesTest do
       # Create active tokens with proper user_ids
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
-      token1 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user1,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
-      token2 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user2,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      token1 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user1,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
+
+      token2 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user2,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
+
       active_tokens = [token1, token2]
 
       # Create usage records for active tokens
@@ -118,11 +127,13 @@ defmodule JustTravelTest.Tokens.QueriesTest do
   describe "get_token_by_id/2" do
     test "returns token when found" do
       user_id = TokenFactory.user_uuid()
-      token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user_id,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user_id,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       # Create usage record
       TokenFactory.create_token_usage(
@@ -157,11 +168,13 @@ defmodule JustTravelTest.Tokens.QueriesTest do
   describe "get_token_by_user/1" do
     test "returns active token for user" do
       user_id = TokenFactory.user_uuid()
-      token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user_id,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user_id,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       # Create usage record
       TokenFactory.create_token_usage(
@@ -188,6 +201,7 @@ defmodule JustTravelTest.Tokens.QueriesTest do
   describe "count_active_tokens/0" do
     test "returns correct count" do
       users = Enum.map(1..5, fn _ -> TokenFactory.user_uuid() end)
+
       active_tokens =
         Enum.map(users, fn user_id ->
           TokenFactory.create_token(

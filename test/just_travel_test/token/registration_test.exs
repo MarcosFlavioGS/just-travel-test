@@ -100,7 +100,12 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
              end)
 
       # Verify all succeeded
-      successful = Enum.count(results, fn {:ok, {:ok, _}} -> true; _ -> false end)
+      successful =
+        Enum.count(results, fn
+          {:ok, {:ok, _}} -> true
+          _ -> false
+        end)
+
       assert successful == length(user_ids)
 
       # Should have at least 5 active tokens (we had 5 available, plus any from seeds)

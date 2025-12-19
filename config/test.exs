@@ -4,8 +4,10 @@ import Config
 # Use shorter lifetime and more frequent checks for faster, more reliable tests
 config :just_travel_test, JustTravelTest.Tokens,
   max_active_tokens: 100,
-  token_lifetime_minutes: 1,  # 1 minute for faster test execution
-  check_interval_seconds: 10  # Check every 10 seconds in tests
+  # 1 minute for faster test execution
+  token_lifetime_minutes: 1,
+  # Check every 10 seconds in tests
+  check_interval_seconds: 10
 
 # Configure your database
 #

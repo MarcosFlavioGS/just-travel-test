@@ -2,7 +2,9 @@ defmodule JustTravelTestWeb.ErrorJSONTest do
   use JustTravelTestWeb.ConnCase, async: true
 
   test "renders 404" do
-    assert JustTravelTestWeb.ErrorJSON.render("404.json", %{}) == %{errors: %{detail: "Not Found"}}
+    assert JustTravelTestWeb.ErrorJSON.render("404.json", %{}) == %{
+             errors: %{detail: "Not Found"}
+           }
   end
 
   test "renders 500" do

@@ -36,14 +36,20 @@ defmodule JustTravelTest.Token.TokenSchema do
     allow_nil = Keyword.get(opts, :allow_nil, false)
 
     case get_field(changeset, field) do
-      nil when allow_nil -> changeset
-      nil -> add_error(changeset, field, "can't be blank")
+      nil when allow_nil ->
+        changeset
+
+      nil ->
+        add_error(changeset, field, "can't be blank")
+
       value when is_binary(value) ->
         case Ecto.UUID.cast(value) do
           {:ok, _uuid} -> changeset
           :error -> add_error(changeset, field, "must be a valid UUID")
         end
-      _ -> changeset
+
+      _ ->
+        changeset
     end
   end
 end

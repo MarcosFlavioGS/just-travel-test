@@ -111,11 +111,12 @@ defmodule JustTravelTestWeb.Token.TokenControllerTest do
 
   describe "GET /api/tokens/:token_id" do
     test "returns token details", %{conn: conn} do
-      token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: TokenFactory.user_uuid(),
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+      token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: TokenFactory.user_uuid(),
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       conn = get(conn, ~p"/api/tokens/#{token.id}")
 

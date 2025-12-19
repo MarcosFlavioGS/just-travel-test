@@ -7,18 +7,21 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
   describe "release_token/1" do
     test "releases an active token" do
       user_id = TokenFactory.user_uuid()
-      token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user_id,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user_id,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       # Create an active usage record
-      usage = TokenFactory.create_token_usage(
-        token_id: token.id,
-        user_id: user_id,
-        started_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+      usage =
+        TokenFactory.create_token_usage(
+          token_id: token.id,
+          user_id: user_id,
+          started_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       assert {:ok, released} = Tokens.release_token(token.id)
 
@@ -49,11 +52,13 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
   describe "release_token_by_user/1" do
     test "releases token by user_id" do
       user_id = TokenFactory.user_uuid()
-      token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user_id,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user_id,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       # Create usage record to match the token
       TokenFactory.create_token_usage(
@@ -82,11 +87,12 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
 
-      oldest_token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user1,
-        activated_at: DateTime.add(now, -300, :second)
-      )
+      oldest_token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user1,
+          activated_at: DateTime.add(now, -300, :second)
+        )
 
       # Create usage record for oldest token
       TokenFactory.create_token_usage(
@@ -95,11 +101,12 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
         started_at: oldest_token.activated_at
       )
 
-      newer_token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user2,
-        activated_at: DateTime.add(now, -60, :second)
-      )
+      newer_token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user2,
+          activated_at: DateTime.add(now, -60, :second)
+        )
 
       # Create usage record for newer token
       TokenFactory.create_token_usage(
@@ -132,6 +139,7 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
     test "releases all active tokens" do
       # Create mix of active and available tokens
       users = Enum.map(1..5, fn _ -> TokenFactory.user_uuid() end)
+
       active_tokens =
         Enum.map(users, fn user_id ->
           TokenFactory.create_token(

@@ -34,13 +34,17 @@ defmodule JustTravelTest.Token.TokenUsageSchema do
 
   defp validate_uuid(changeset, field) do
     case get_field(changeset, field) do
-      nil -> add_error(changeset, field, "can't be blank")
+      nil ->
+        add_error(changeset, field, "can't be blank")
+
       value when is_binary(value) ->
         case Ecto.UUID.cast(value) do
           {:ok, _uuid} -> changeset
           :error -> add_error(changeset, field, "must be a valid UUID")
         end
-      _ -> changeset
+
+      _ ->
+        changeset
     end
   end
 end

@@ -10,11 +10,13 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
       # Config is 1 minute for tests, so use 65 seconds (1 minute 5 seconds) to ensure it's definitely expired
       user_id = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
-      expired_token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user_id,
-        activated_at: expired_time
-      )
+
+      expired_token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user_id,
+          activated_at: expired_time
+        )
 
       # Reload token to ensure it's in the database with correct state
       alias JustTravelTest.Repo
@@ -34,11 +36,13 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
 
       # Create active token (not expired - activated now)
       active_user_id = TokenFactory.user_uuid()
-      active_token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: active_user_id,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      active_token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: active_user_id,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       # Create usage record for active token
       TokenFactory.create_token_usage(
@@ -71,16 +75,20 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
-      expired1 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user1,
-        activated_at: expired_time
-      )
-      expired2 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user2,
-        activated_at: expired_time
-      )
+
+      expired1 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user1,
+          activated_at: expired_time
+        )
+
+      expired2 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user2,
+          activated_at: expired_time
+        )
 
       # Create usage records
       TokenFactory.create_token_usage(
@@ -88,6 +96,7 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
         user_id: user1,
         started_at: expired1.activated_at
       )
+
       TokenFactory.create_token_usage(
         token_id: expired2.id,
         user_id: user2,
@@ -96,11 +105,13 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
 
       # Create active token (not expired)
       active_user_id = TokenFactory.user_uuid()
-      active_token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: active_user_id,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      active_token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: active_user_id,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       # Create usage record for active token
       TokenFactory.create_token_usage(
@@ -130,11 +141,13 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
       # Config is 1 minute for tests, so use 65 seconds to ensure it's definitely expired
       user_id = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
-      expired_token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user_id,
-        activated_at: expired_time
-      )
+
+      expired_token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user_id,
+          activated_at: expired_time
+        )
 
       # Create usage record
       TokenFactory.create_token_usage(

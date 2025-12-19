@@ -18,16 +18,20 @@ defmodule JustTravelTest.Tokens.ManagerTest do
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
-      expired1 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user1,
-        activated_at: expired_time
-      )
-      expired2 = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: user2,
-        activated_at: expired_time
-      )
+
+      expired1 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user1,
+          activated_at: expired_time
+        )
+
+      expired2 =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: user2,
+          activated_at: expired_time
+        )
 
       # Create usage records
       TokenFactory.create_token_usage(
@@ -35,6 +39,7 @@ defmodule JustTravelTest.Tokens.ManagerTest do
         user_id: user1,
         started_at: expired1.activated_at
       )
+
       TokenFactory.create_token_usage(
         token_id: expired2.id,
         user_id: user2,
@@ -43,11 +48,13 @@ defmodule JustTravelTest.Tokens.ManagerTest do
 
       # Create active token (not expired)
       active_user_id = TokenFactory.user_uuid()
-      active_token = TokenFactory.create_token(
-        state: :active,
-        utilizer_uuid: active_user_id,
-        activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      )
+
+      active_token =
+        TokenFactory.create_token(
+          state: :active,
+          utilizer_uuid: active_user_id,
+          activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+        )
 
       # Create usage record for active token
       TokenFactory.create_token_usage(
