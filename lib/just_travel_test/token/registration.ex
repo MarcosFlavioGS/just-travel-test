@@ -31,7 +31,7 @@ defmodule JustTravelTest.Tokens.Registration do
           do_register_token_usage(user_id)
 
         :error ->
-          Repo.rollback({:error, :invalid_user_id})
+          Repo.rollback(:invalid_user_id)
       end
     end)
     |> case do
@@ -54,7 +54,7 @@ defmodule JustTravelTest.Tokens.Registration do
     # Find an available token
     case get_available_token() do
       nil ->
-        Repo.rollback({:error, :no_available_tokens})
+        Repo.rollback(:no_available_tokens)
 
       token ->
         now = DateTime.utc_now() |> DateTime.truncate(:second)
