@@ -8,6 +8,7 @@ defmodule JustTravelTest.Tokens.Registration do
   alias JustTravelTest.Token.TokenUsageSchema
   alias JustTravelTest.Tokens.Release
   alias JustTravelTest.Tokens.Queries
+  alias JustTravelTest.Tokens.Logger
 
   @max_active_tokens Application.compile_env(
                        :just_travel_test,
@@ -28,19 +29,46 @@ defmodule JustTravelTest.Tokens.Registration do
   Returns `{:error, reason}` on failure.
   """
   def register_token_usage(user_id) when is_binary(user_id) do
-    Repo.transaction(fn ->
-      case Ecto.UUID.cast(user_id) do
-        {:ok, _uuid} ->
-          do_register_token_usage(user_id)
+    start_time = System.monotonic_time()
 
-        :error ->
-          Repo.rollback(:invalid_user_id)
+    result =
+      Repo.transaction(fn ->
+        case Ecto.UUID.cast(user_id) do
+          {:ok, _uuid} ->
+            do_register_token_usage(user_id)
+
+          :error ->
+            Repo.rollback(:invalid_user_id)
+        end
+      end)
+      |> case do
+        {:ok, result} -> result
+        {:error, reason} -> {:error, reason}
       end
-    end)
-    |> case do
-      {:ok, result} -> result
-      {:error, reason} -> {:error, reason}
+
+    duration = System.monotonic_time() - start_time
+
+    case result do
+      {:ok, %{token_id: token_id}} ->
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :activation, :success],
+          %{duration: duration},
+          %{token_id: token_id, user_id: user_id}
+        )
+
+        Logger.log_activation_success(token_id, user_id, %{duration_ms: duration})
+
+      {:error, reason} ->
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :activation, :failure],
+          %{duration: duration},
+          %{user_id: user_id, reason: reason}
+        )
+
+        Logger.log_activation_failure(user_id, reason, %{duration_ms: duration})
     end
+
+    result
   end
 
   def register_token_usage(_), do: {:error, :invalid_user_id}

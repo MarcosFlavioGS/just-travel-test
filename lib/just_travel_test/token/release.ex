@@ -7,6 +7,7 @@ defmodule JustTravelTest.Tokens.Release do
   alias JustTravelTest.Token.TokenSchema
   alias JustTravelTest.Token.TokenUsageSchema
   alias JustTravelTest.Tokens.Queries
+  alias JustTravelTest.Tokens.Logger
 
   @doc """
   Releases a token by its ID.
@@ -14,42 +15,69 @@ defmodule JustTravelTest.Tokens.Release do
   Sets the token state to `:available` and closes the active usage record.
   """
   def release_token(token_id) when is_binary(token_id) do
-    case Ecto.UUID.cast(token_id) do
-      {:ok, _uuid} ->
-        Repo.transaction(fn ->
-          case Repo.get(TokenSchema, token_id) do
-            nil ->
-              Repo.rollback({:error, :token_not_found})
+    start_time = System.monotonic_time()
 
-            token when token.state == :available ->
-              token
+    result =
+      case Ecto.UUID.cast(token_id) do
+        {:ok, _uuid} ->
+          Repo.transaction(fn ->
+            case Repo.get(TokenSchema, token_id) do
+              nil ->
+                Repo.rollback({:error, :token_not_found})
 
-            token ->
-              now = DateTime.utc_now() |> DateTime.truncate(:second)
-
-              updated_token =
+              token when token.state == :available ->
                 token
-                |> TokenSchema.changeset(%{
-                  state: :available,
-                  utilizer_uuid: nil,
-                  released_at: now
-                })
-                |> Repo.update!()
 
-              close_active_usage(token_id, now)
+              token ->
+                now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-              updated_token
+                updated_token =
+                  token
+                  |> TokenSchema.changeset(%{
+                    state: :available,
+                    utilizer_uuid: nil,
+                    released_at: now
+                  })
+                  |> Repo.update!()
+
+                close_active_usage(token_id, now)
+
+                updated_token
+            end
+          end)
+          |> case do
+            {:ok, token} -> {:ok, token}
+            {:error, {:error, reason}} -> {:error, reason}
+            {:error, reason} -> {:error, reason}
           end
-        end)
-        |> case do
-          {:ok, token} -> {:ok, token}
-          {:error, {:error, reason}} -> {:error, reason}
-          {:error, reason} -> {:error, reason}
-        end
 
-      :error ->
-        {:error, :invalid_token_id}
+        :error ->
+          {:error, :invalid_token_id}
+      end
+
+    duration = System.monotonic_time() - start_time
+
+    case result do
+      {:ok, token} ->
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :release, :success],
+          %{duration: duration},
+          %{token_id: token_id, previous_user_id: token.utilizer_uuid}
+        )
+
+        Logger.log_release_success(token_id, token.utilizer_uuid, %{duration_ms: duration})
+
+      {:error, reason} ->
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :release, :failure],
+          %{duration: duration},
+          %{token_id: token_id, reason: reason}
+        )
+
+        Logger.log_release_failure(token_id, reason, %{duration_ms: duration})
     end
+
+    result
   end
 
   def release_token(_), do: {:error, :invalid_token_id}

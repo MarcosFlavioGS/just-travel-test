@@ -55,6 +55,21 @@ if config_env() == :prod do
 
   config :just_travel_test, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
+  # Rate limiting configuration (can be overridden via environment variables)
+  config :just_travel_test,
+         :enable_rate_limiting,
+         System.get_env("ENABLE_RATE_LIMITING", "true") |> String.downcase() == "true"
+
+  config :just_travel_test,
+         :rate_limit_per_minute,
+         System.get_env("RATE_LIMIT_PER_MINUTE", "100") |> String.to_integer()
+
+  # Token management configuration (can be overridden via environment variables)
+  config :just_travel_test, JustTravelTest.Tokens,
+    max_active_tokens: System.get_env("MAX_ACTIVE_TOKENS", "100") |> String.to_integer(),
+    token_lifetime_minutes: System.get_env("TOKEN_LIFETIME_MINUTES", "2") |> String.to_integer(),
+    check_interval_seconds: System.get_env("CHECK_INTERVAL_SECONDS", "30") |> String.to_integer()
+
   config :just_travel_test, JustTravelTestWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [

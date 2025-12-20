@@ -79,7 +79,59 @@ defmodule JustTravelTestWeb.Telemetry do
       summary("vm.memory.total", unit: {:byte, :kilobyte}),
       summary("vm.total_run_queue_lengths.total"),
       summary("vm.total_run_queue_lengths.cpu"),
-      summary("vm.total_run_queue_lengths.io")
+      summary("vm.total_run_queue_lengths.io"),
+
+      # Token Management Metrics
+      counter("just_travel_test.tokens.activation.success",
+        description: "Number of successful token activations"
+      ),
+      counter("just_travel_test.tokens.activation.failure",
+        description: "Number of failed token activations",
+        tags: [:reason]
+      ),
+      summary("just_travel_test.tokens.activation.success.duration",
+        unit: {:native, :millisecond},
+        description: "Duration of successful token activations"
+      ),
+      summary("just_travel_test.tokens.activation.failure.duration",
+        unit: {:native, :millisecond},
+        description: "Duration of failed token activations"
+      ),
+      counter("just_travel_test.tokens.release.success",
+        description: "Number of successful token releases"
+      ),
+      counter("just_travel_test.tokens.release.failure",
+        description: "Number of failed token releases",
+        tags: [:reason]
+      ),
+      summary("just_travel_test.tokens.release.success.duration",
+        unit: {:native, :millisecond},
+        description: "Duration of successful token releases"
+      ),
+      counter("just_travel_test.tokens.expiration.success",
+        description: "Number of successful expiration checks"
+      ),
+      counter("just_travel_test.tokens.expiration.failure",
+        description: "Number of failed expiration checks"
+      ),
+      summary("just_travel_test.tokens.expiration.success.duration",
+        unit: {:native, :millisecond},
+        description: "Duration of expiration checks"
+      ),
+      last_value("just_travel_test.tokens.expiration.success.count",
+        description: "Number of tokens released in last expiration check"
+      ),
+      counter("just_travel_test.tokens.manager.check",
+        description: "Number of manager periodic checks",
+        tags: [:status]
+      ),
+      summary("just_travel_test.tokens.manager.check.duration",
+        unit: {:native, :millisecond},
+        description: "Duration of manager checks"
+      ),
+      last_value("just_travel_test.tokens.manager.check.released_count",
+        description: "Number of tokens released in last manager check"
+      )
     ]
   end
 

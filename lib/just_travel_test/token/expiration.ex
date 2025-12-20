@@ -6,6 +6,7 @@ defmodule JustTravelTest.Tokens.Expiration do
   alias JustTravelTest.Repo
   alias JustTravelTest.Token.TokenSchema
   alias JustTravelTest.Token.TokenUsageSchema
+  alias JustTravelTest.Tokens.Logger
 
   @token_lifetime_minutes Application.compile_env(
                             :just_travel_test,
@@ -38,38 +39,74 @@ defmodule JustTravelTest.Tokens.Expiration do
   Returns the count of released tokens.
   """
   def release_expired_tokens do
+    start_time = System.monotonic_time()
     expired_tokens = find_expired_tokens()
 
-    if Enum.empty?(expired_tokens) do
-      {:ok, 0}
-    else
-      Repo.transaction(fn ->
-        now = DateTime.utc_now() |> DateTime.truncate(:second)
-        expired_token_ids = Enum.map(expired_tokens, & &1.id)
+    result =
+      if Enum.empty?(expired_tokens) do
+        {:ok, 0}
+      else
+        Repo.transaction(fn ->
+          now = DateTime.utc_now() |> DateTime.truncate(:second)
+          expired_token_ids = Enum.map(expired_tokens, & &1.id)
 
-        # Update all expired tokens
-        {count, _} =
-          from(t in TokenSchema, where: t.id in ^expired_token_ids)
-          |> Repo.update_all(
-            set: [
-              state: :available,
-              utilizer_uuid: nil,
-              released_at: now
-            ]
+          # Update all expired tokens
+          {count, _} =
+            from(t in TokenSchema, where: t.id in ^expired_token_ids)
+            |> Repo.update_all(
+              set: [
+                state: :available,
+                utilizer_uuid: nil,
+                released_at: now
+              ]
+            )
+
+          # Close all active usage records for expired tokens
+          from(usage in TokenUsageSchema,
+            where: usage.token_id in ^expired_token_ids and is_nil(usage.ended_at)
           )
+          |> Repo.update_all(set: [ended_at: now])
 
-        # Close all active usage records for expired tokens
-        from(usage in TokenUsageSchema,
-          where: usage.token_id in ^expired_token_ids and is_nil(usage.ended_at)
-        )
-        |> Repo.update_all(set: [ended_at: now])
-
-        count
-      end)
-      |> case do
-        {:ok, count} -> {:ok, count}
-        {:error, reason} -> {:error, reason}
+          count
+        end)
+        |> case do
+          {:ok, count} -> {:ok, count}
+          {:error, reason} -> {:error, reason}
+        end
       end
+
+    duration = System.monotonic_time() - start_time
+
+    case result do
+      {:ok, count} when count > 0 ->
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :expiration, :success],
+          %{duration: duration, count: count},
+          %{expired_count: length(expired_tokens)}
+        )
+
+        Logger.log_expiration(count, %{
+          duration_ms: duration,
+          expired_count: length(expired_tokens)
+        })
+
+      {:ok, 0} ->
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :expiration, :success],
+          %{duration: duration, count: 0},
+          %{expired_count: 0}
+        )
+
+      {:error, reason} ->
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :expiration, :failure],
+          %{duration: duration},
+          %{reason: reason}
+        )
+
+        Logger.log_error(:expiration, reason, %{duration_ms: duration})
     end
+
+    result
   end
 end

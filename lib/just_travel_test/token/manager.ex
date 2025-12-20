@@ -10,6 +10,7 @@ defmodule JustTravelTest.Tokens.Manager do
   """
   use GenServer
   alias JustTravelTest.Tokens.Expiration
+  alias JustTravelTest.Tokens.Logger
 
   @check_interval_seconds Application.compile_env(
                             :just_travel_test,
@@ -46,18 +47,42 @@ defmodule JustTravelTest.Tokens.Manager do
 
   @impl true
   def handle_info(:check_expired_tokens, state) do
+    start_time = System.monotonic_time()
+
     # Perform the check and release expired tokens
     case Expiration.release_expired_tokens() do
       {:ok, count} when count > 0 ->
-        require Logger
-        Logger.info("TokenManager: Released #{count} expired token(s)")
+        duration = System.monotonic_time() - start_time
+
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :manager, :check],
+          %{duration: duration, released_count: count},
+          %{status: :success}
+        )
+
+        Logger.log_manager_check(count, %{duration_ms: duration})
 
       {:ok, 0} ->
-        :ok
+        duration = System.monotonic_time() - start_time
+
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :manager, :check],
+          %{duration: duration, released_count: 0},
+          %{status: :no_expired}
+        )
+
+        Logger.log_manager_check(0, %{duration_ms: duration})
 
       {:error, reason} ->
-        require Logger
-        Logger.error("TokenManager: Error releasing expired tokens: #{inspect(reason)}")
+        duration = System.monotonic_time() - start_time
+
+        :telemetry.execute(
+          [:just_travel_test, :tokens, :manager, :check],
+          %{duration: duration},
+          %{status: :error, reason: reason}
+        )
+
+        Logger.log_error(:manager_check, reason, %{duration_ms: duration})
     end
 
     # Schedule the next check and update state
