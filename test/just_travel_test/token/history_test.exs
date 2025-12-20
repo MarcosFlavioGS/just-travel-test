@@ -43,7 +43,9 @@ defmodule JustTravelTest.Tokens.HistoryTest do
 
       # Verify ordering: first_usage should be more recent than second_usage
       comparison = DateTime.compare(first_usage.started_at, second_usage.started_at)
-      assert comparison == :gt, "Expected first_usage to be more recent, but timestamps are: first=#{inspect(first_usage.started_at)}, second=#{inspect(second_usage.started_at)}"
+
+      assert comparison == :gt,
+             "Expected first_usage to be more recent, but timestamps are: first=#{inspect(first_usage.started_at)}, second=#{inspect(second_usage.started_at)}"
 
       # The first usage should be the most recent (user2, not ended)
       assert first_usage.user_id == user2

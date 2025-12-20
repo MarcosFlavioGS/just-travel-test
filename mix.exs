@@ -11,10 +11,9 @@ defmodule JustTravelTest.MixProject do
       aliases: aliases(),
       deps: deps(),
       listeners: [Phoenix.CodeReloader],
-
       docs: [
-      output: "docs"
-    ]
+        output: "docs"
+      ]
     ]
   end
 

@@ -51,6 +51,7 @@ defmodule JustTravelTestWeb.Token.TokenControllerTest do
         |> Enum.map(fn {user_id, index} ->
           # Create tokens with slightly different activation times
           activated_at = DateTime.add(base_time, -index, :second)
+
           TokenFactory.create_token(
             state: :active,
             utilizer_uuid: user_id,
