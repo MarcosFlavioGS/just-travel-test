@@ -3,12 +3,6 @@ defmodule JustTravelTestWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    # Rate limiting (only in production by default)
-    if Application.compile_env(:just_travel_test, :enable_rate_limiting, Mix.env() == :prod) do
-      plug JustTravelTestWeb.Plugs.RateLimiter,
-        limit: Application.compile_env(:just_travel_test, :rate_limit_per_minute, 100),
-        window_ms: 60_000
-    end
   end
 
   # Health check endpoint (no authentication required)

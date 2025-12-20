@@ -9,10 +9,6 @@ config :swoosh, local: false
 # Do not print debug messages in production
 config :logger, level: :info
 
-# Rate limiting configuration
-config :just_travel_test, :enable_rate_limiting, true
-config :just_travel_test, :rate_limit_per_minute, 100
-
 # Production logging configuration
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
