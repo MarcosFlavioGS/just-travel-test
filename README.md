@@ -20,17 +20,6 @@ Este projeto implementa um sistema robusto de gerenciamento de tokens que manté
 - **Telemetria**: Métricas e eventos para monitoramento em produção
 - **Logging Estruturado**: Logs consistentes com contexto para produção
 
-## 📚 Documentação
-
-A documentação completa do projeto está disponível em:
-
-**[📖 Ver Documentação Completa](https://marcosflaviogs.github.io/just-travel-test/)**
-
-A documentação inclui:
-- Referência completa da API
-- Documentação de todos os módulos
-- Guias de uso e exemplos
-- Estrutura do projeto
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -106,16 +95,15 @@ GET /api/tokens/:token_id/usages
 DELETE /api/tokens/active
 ```
 
-Para mais detalhes sobre a API, consulte a [Documentação Completa](https://marcosflaviogs.github.io/just-travel-test/) gerada pelo ExDoc.
+Para mais detalhes sobre a API, consulte a [Documentação Completa](https://marcosflaviogs.github.io/just-travel-test/) gerada pelo ExDoc (disponível em `docs/`).
 
-## 📖 Documentação Adicional
+## 📖 Documentação
 
-- [Documentação Completa](https://marcosflaviogs.github.io/just-travel-test/) - Referência completa da API e módulos (ExDoc)
-- [Plano do Sistema de Tokens](./TOKEN_SYSTEM_PLAN.md) - Arquitetura e design
-- [Phase 2: Production Readiness](./docs/PHASE_2_PRODUCTION_READINESS.md) - Funcionalidades de produção
-- [Variáveis de Ambiente](./docs/ENVIRONMENT_VARIABLES.md) - Guia de configuração
-- [Entendendo Repo.rollback()](./docs/REPO_ROLLBACK_EXPLANATION.md) - Explicação sobre transações
-- [Entendendo Repo.transaction()](./docs/TRANSACTIONS_EXPLANATION.md) - Explicação sobre transações
+A documentação completa do projeto, incluindo referência da API e todos os módulos, está disponível em:
+
+**[📖 Ver Documentação Completa](https://marcosflaviogs.github.io/just-travel-test/)**
+
+A documentação é gerada automaticamente pelo ExDoc e está disponível localmente em `docs/` após executar `mix docs`.
 
 ## 🏗️ Estrutura do Projeto
 
@@ -143,8 +131,7 @@ lib/
     live/               # LiveViews (futuro)
 
 test/                   # Testes
-docs/                   # Documentação adicional
-doc/                    # Documentação gerada pelo ExDoc
+docs/                   # Documentação gerada pelo ExDoc
 ```
 
 ## ⚙️ Configuração
@@ -186,8 +173,6 @@ export PHX_HOST=api.example.com
 export PORT=4000
 ```
 
-Para mais detalhes, consulte o [Guia de Variáveis de Ambiente](./docs/ENVIRONMENT_VARIABLES.md).
-
 ## 🚀 Produção
 
 ### Funcionalidades de Produção
@@ -210,11 +195,11 @@ As métricas estão disponíveis no Phoenix LiveDashboard (em desenvolvimento) e
 
 ### Deploy
 
-Consulte o [Guia de Produção](./docs/PHASE_2_PRODUCTION_READINESS.md) para:
-- Checklist de deploy
-- Recomendações de monitoramento
-- Configuração de alertas
-- Próximos passos
+Para deploy em produção, certifique-se de:
+- Configurar todas as variáveis de ambiente obrigatórias
+- Verificar o endpoint `/health` para monitoramento
+- Configurar alertas para métricas de telemetria
+- Revisar configurações de rate limiting conforme necessário
 
 ## 📝 Licença
 
