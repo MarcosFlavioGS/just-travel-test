@@ -16,7 +16,6 @@ Este projeto implementa um sistema robusto de gerenciamento de tokens que manté
 - **API RESTful**: Endpoints JSON para todas as operações
 - **Processo Supervisionado**: GenServer para verificação periódica de tokens expirados
 - **Health Check**: Endpoint `/health` para monitoramento e load balancers
-- **Rate Limiting**: Proteção contra abuso de API (configurável)
 - **Telemetria**: Métricas e eventos para monitoramento em produção
 - **Logging Estruturado**: Logs consistentes com contexto para produção
 
@@ -29,7 +28,6 @@ Este projeto implementa um sistema robusto de gerenciamento de tokens que manté
 - **Ecto** - ORM e queries
 - **GenServer** - Processos supervisionados para auto-liberação
 - **Telemetry** - Métricas e eventos para monitoramento
-- **ETS** - Armazenamento em memória para rate limiting
 - **ExDoc** - Geração de documentação
 
 ## 📦 Instalação
@@ -125,10 +123,7 @@ lib/
     controllers/
       token/            # Controllers da API
       health_controller.ex  # Health check endpoint
-    plugs/
-      rate_limiter.ex   # Rate limiting plug
     telemetry.ex        # Configuração de telemetria
-    live/               # LiveViews (futuro)
 
 test/                   # Testes
 docs/                   # Documentação gerada pelo ExDoc
@@ -159,8 +154,6 @@ Para produção, configure as seguintes variáveis de ambiente:
 **Opcionais**:
 - `PORT` - Porta HTTP (padrão: 4000)
 - `POOL_SIZE` - Tamanho do pool de conexões (padrão: 10)
-- `ENABLE_RATE_LIMITING` - Habilitar rate limiting (padrão: true em prod)
-- `RATE_LIMIT_PER_MINUTE` - Limite de requisições por minuto (padrão: 100)
 - `MAX_ACTIVE_TOKENS` - Máximo de tokens ativos (padrão: 100)
 - `TOKEN_LIFETIME_MINUTES` - Tempo de vida do token (padrão: 2)
 - `CHECK_INTERVAL_SECONDS` - Intervalo de verificação (padrão: 30)
@@ -178,7 +171,6 @@ export PORT=4000
 ### Funcionalidades de Produção
 
 - ✅ **Health Check**: Endpoint `/health` para monitoramento
-- ✅ **Rate Limiting**: Proteção contra abuso (100 req/min por IP)
 - ✅ **Telemetria**: Métricas para monitoramento (Phoenix LiveDashboard)
 - ✅ **Logging Estruturado**: Logs consistentes com contexto
 - ✅ **Configuração via Ambiente**: Todas as configurações via variáveis de ambiente
@@ -199,7 +191,6 @@ Para deploy em produção, certifique-se de:
 - Configurar todas as variáveis de ambiente obrigatórias
 - Verificar o endpoint `/health` para monitoramento
 - Configurar alertas para métricas de telemetria
-- Revisar configurações de rate limiting conforme necessário
 
 ## 📝 Licença
 
