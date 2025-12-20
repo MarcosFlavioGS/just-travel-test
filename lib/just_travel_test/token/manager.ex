@@ -53,7 +53,6 @@ defmodule JustTravelTest.Tokens.Manager do
         Logger.info("TokenManager: Released #{count} expired token(s)")
 
       {:ok, 0} ->
-        # No expired tokens, nothing to log
         :ok
 
       {:error, reason} ->
@@ -73,10 +72,7 @@ defmodule JustTravelTest.Tokens.Manager do
     {:reply, result, state}
   end
 
-  ## Private Functions
-
   defp schedule_next_check do
-    # Schedule the next check after the configured interval
     # Returns a timer reference that can be used to cancel if needed
     Process.send_after(self(), :check_expired_tokens, @check_interval_seconds * 1000)
   end

@@ -29,7 +29,6 @@ defmodule JustTravelTest.Tokens.Registration do
   """
   def register_token_usage(user_id) when is_binary(user_id) do
     Repo.transaction(fn ->
-      # Validate user_id is a valid UUID
       case Ecto.UUID.cast(user_id) do
         {:ok, _uuid} ->
           do_register_token_usage(user_id)
@@ -47,15 +46,12 @@ defmodule JustTravelTest.Tokens.Registration do
   def register_token_usage(_), do: {:error, :invalid_user_id}
 
   defp do_register_token_usage(user_id) do
-    # Check if we're at the limit
     active_count = Queries.count_active_tokens()
 
     if active_count >= @max_active_tokens do
-      # Release the oldest active token
       Release.release_oldest_active_token()
     end
 
-    # Find an available token
     case get_available_token() do
       nil ->
         Repo.rollback(:no_available_tokens)

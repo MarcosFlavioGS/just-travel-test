@@ -17,7 +17,6 @@ defmodule JustTravelTest.Tokens.Queries do
     query = from(t in TokenSchema, order_by: [asc: t.id])
 
     if Keyword.get(opts, :with_usage_count, false) do
-      # Use a join to get usage counts efficiently
       from(t in query,
         left_join: usage in assoc(t, :token_usages),
         group_by: [t.id],
@@ -56,7 +55,6 @@ defmodule JustTravelTest.Tokens.Queries do
     query = from(t in TokenSchema, where: t.state == :active, order_by: [asc: t.activated_at])
 
     if Keyword.get(opts, :with_usage_count, false) do
-      # Use a join to get usage counts efficiently
       from(t in query,
         left_join: usage in assoc(t, :token_usages),
         group_by: [t.id],
@@ -90,7 +88,6 @@ defmodule JustTravelTest.Tokens.Queries do
 
         query =
           if Keyword.get(opts, :preload_usage_count, false) do
-            # Use a join to get usage count in a single query
             from(t in query,
               left_join: usage in assoc(t, :token_usages),
               group_by: [t.id],
@@ -107,7 +104,6 @@ defmodule JustTravelTest.Tokens.Queries do
 
         case result do
           %{token: token, usage_count: count} ->
-            # Add usage_count as a map field (not a struct field)
             token
             |> Map.from_struct()
             |> Map.put(:usage_count, count)

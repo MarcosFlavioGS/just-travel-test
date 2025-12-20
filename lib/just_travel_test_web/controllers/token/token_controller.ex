@@ -8,7 +8,6 @@ defmodule JustTravelTestWeb.Token.TokenController do
 
   action_fallback JustTravelTestWeb.Token.FallbackController
 
-  # Set the default JSON view for all actions
   plug :put_view, json: JustTravelTestWeb.Token.TokenJSON
 
   @doc """
@@ -90,8 +89,6 @@ defmodule JustTravelTestWeb.Token.TokenController do
       |> render(:clear_active, cleared_count: cleared_count)
     end
   end
-
-  ## Private Helper Functions
 
   defp get_tokens_by_state("available") do
     {:ok, Tokens.list_available_tokens()}

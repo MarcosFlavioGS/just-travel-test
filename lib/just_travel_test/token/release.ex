@@ -27,7 +27,6 @@ defmodule JustTravelTest.Tokens.Release do
             token ->
               now = DateTime.utc_now() |> DateTime.truncate(:second)
 
-              # Update token
               updated_token =
                 token
                 |> TokenSchema.changeset(%{
@@ -37,7 +36,6 @@ defmodule JustTravelTest.Tokens.Release do
                 })
                 |> Repo.update!()
 
-              # Close active usage record
               close_active_usage(token_id, now)
 
               updated_token
@@ -138,8 +136,6 @@ defmodule JustTravelTest.Tokens.Release do
       {:error, reason} -> {:error, reason}
     end
   end
-
-  ## Private Helper Functions
 
   defp get_oldest_active_token do
     from(t in TokenSchema,
