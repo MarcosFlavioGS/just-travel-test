@@ -5,6 +5,7 @@ JustTravelTest.Token.TokenSchema.html
 JustTravelTest.Token.TokenUsageSchema.html
 JustTravelTest.Tokens.Expiration.html
 JustTravelTest.Tokens.History.html
+JustTravelTest.Tokens.Logger.html
 JustTravelTest.Tokens.Manager.html
 JustTravelTest.Tokens.Queries.html
 JustTravelTest.Tokens.Registration.html
@@ -14,6 +15,7 @@ JustTravelTest.html
 JustTravelTestWeb.Endpoint.html
 JustTravelTestWeb.ErrorJSON.html
 JustTravelTestWeb.Gettext.html
+JustTravelTestWeb.HealthController.html
 JustTravelTestWeb.Router.html
 JustTravelTestWeb.Telemetry.html
 JustTravelTestWeb.Token.ErrorJSON.html
@@ -29,7 +31,7 @@ dist/lato-latin-700-normal-2XVSBPG4.woff2
 dist/lato-latin-ext-400-normal-N27NCBWW.woff2
 dist/lato-latin-ext-700-normal-Q2L5DVMW.woff2
 dist/remixicon-QPNJX265.woff2
-dist/search_data-765C21BF.js
-dist/sidebar_items-5B0ABDF5.js
+dist/search_data-3A9B0314.js
+dist/sidebar_items-2E439199.js
 index.html
 search.html
