@@ -15,7 +15,7 @@ defmodule JustTravelTestWeb.Health.HealthController do
 
   action_fallback JustTravelTestWeb.Health.FallbackController
 
-  plug :put_view, json: JustTravelTestWeb.Health.HealthJSON
+  plug :accepts, ["json"]
 
   @doc """
   Health check endpoint.

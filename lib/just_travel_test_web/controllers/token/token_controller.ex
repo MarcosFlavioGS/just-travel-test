@@ -8,8 +8,6 @@ defmodule JustTravelTestWeb.Token.TokenController do
 
   action_fallback JustTravelTestWeb.Token.FallbackController
 
-  plug :put_view, json: JustTravelTestWeb.Token.TokenJSON
-
   @doc """
   Activates a token for use by a user.
 
