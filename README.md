@@ -93,8 +93,6 @@ GET /api/tokens/:token_id/usages
 DELETE /api/tokens/active
 ```
 
-Para mais detalhes sobre a API, consulte a [Documentação Completa](https://marcosflaviogs.github.io/just-travel-test/) gerada pelo ExDoc (disponível em `docs/`).
-
 ## 📖 Documentação
 
 A documentação completa do projeto, incluindo referência da API e todos os módulos, está disponível em:
@@ -182,15 +180,6 @@ O sistema emite eventos de telemetria para:
 - Liberação de tokens (sucesso/falha)
 - Verificação de expiração
 - Checks periódicos do manager
-
-As métricas estão disponíveis no Phoenix LiveDashboard (em desenvolvimento) e podem ser exportadas para sistemas externos.
-
-### Deploy
-
-Para deploy em produção, certifique-se de:
-- Configurar todas as variáveis de ambiente obrigatórias
-- Verificar o endpoint `/health` para monitoramento
-- Configurar alertas para métricas de telemetria
 
 ## 📝 Licença
 
