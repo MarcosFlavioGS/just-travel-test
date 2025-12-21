@@ -6,7 +6,7 @@ defmodule JustTravelTestWeb.Router do
   end
 
   # Health check endpoint (no authentication required)
-  get "/health", JustTravelTestWeb.HealthController, :check
+  get "/health", JustTravelTestWeb.Health.HealthController, :check
 
   scope "/api", JustTravelTestWeb do
     pipe_through :api

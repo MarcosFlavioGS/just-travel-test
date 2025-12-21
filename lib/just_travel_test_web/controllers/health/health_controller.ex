@@ -1,4 +1,4 @@
-defmodule JustTravelTestWeb.HealthController do
+defmodule JustTravelTestWeb.Health.HealthController do
   @moduledoc """
   Health check endpoint for monitoring and load balancers.
 
@@ -8,9 +8,14 @@ defmodule JustTravelTestWeb.HealthController do
   - System metrics
   """
   use JustTravelTestWeb, :controller
+
   alias JustTravelTest.Repo
   alias JustTravelTest.Tokens
   alias JustTravelTest.Tokens.Manager
+
+  action_fallback JustTravelTestWeb.Health.FallbackController
+
+  plug :put_view, json: JustTravelTestWeb.Health.HealthJSON
 
   @doc """
   Health check endpoint.
@@ -18,24 +23,10 @@ defmodule JustTravelTestWeb.HealthController do
   Returns 200 OK if all systems are healthy, 503 Service Unavailable otherwise.
   """
   def check(conn, _params) do
-    case check_health() do
-      {:ok, details} ->
-        conn
-        |> put_status(:ok)
-        |> json(%{
-          status: "healthy",
-          timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
-          checks: details
-        })
-
-      {:error, details} ->
-        conn
-        |> put_status(:service_unavailable)
-        |> json(%{
-          status: "unhealthy",
-          timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
-          checks: details
-        })
+    with {:ok, checks} <- check_health() do
+      conn
+      |> put_status(:ok)
+      |> render(:check, checks: checks)
     end
   end
 
@@ -78,18 +69,24 @@ defmodule JustTravelTestWeb.HealthController do
   end
 
   defp get_metrics do
-    try do
-      active_count = Tokens.count_active_tokens()
-      available_count = Tokens.count_available_tokens()
-
+    with {:ok, active_count} <- safe_count(fn -> Tokens.count_active_tokens() end),
+         {:ok, available_count} <- safe_count(fn -> Tokens.count_available_tokens() end) do
       {:ok,
        %{
          active_tokens: active_count,
          available_tokens: available_count,
          total_tokens: active_count + available_count
        }}
+    else
+      {:error, reason} -> {:error, "failed: #{inspect(reason)}"}
+    end
+  end
+
+  defp safe_count(operation) do
+    try do
+      {:ok, operation.()}
     rescue
-      e -> {:error, "failed: #{inspect(e)}"}
+      e -> {:error, e}
     end
   end
 
