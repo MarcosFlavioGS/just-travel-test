@@ -4,6 +4,9 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
   alias JustTravelTest.Tokens
   alias JustTravelTest.TokenFactory
 
+  alias JustTravelTest.Repo
+  alias JustTravelTest.Token.TokenUsageSchema
+
   describe "release_token/1" do
     test "releases an active token" do
       user_id = TokenFactory.user_uuid()
@@ -29,21 +32,20 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
       released_token = Tokens.get_token_by_id(token.id)
       assert released_token.state == :available
       assert released_token.utilizer_uuid == nil
-      # The released_at should be set in the returned token
+
       assert released.released_at != nil
       # Also verify it's set in the database
       assert released_token.released_at != nil
 
       # Verify usage record is closed - reload from database
-      alias JustTravelTest.Repo
-      alias JustTravelTest.Token.TokenUsageSchema
+
       reloaded_usage = Repo.get(TokenUsageSchema, usage.id)
       assert reloaded_usage.ended_at != nil
     end
 
     test "returns error for non-existent token" do
       fake_token_id = Ecto.UUID.generate()
-      # release_token returns {:error, :token_not_found} from rollback
+
       result = Tokens.release_token(fake_token_id)
       assert {:error, :token_not_found} = result
     end
@@ -128,7 +130,6 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
     end
 
     test "returns error when no active tokens exist" do
-      # Create only available tokens
       TokenFactory.create_tokens(5, state: :available)
 
       assert {:error, :no_active_tokens} = Tokens.release_oldest_active_token()
@@ -160,17 +161,16 @@ defmodule JustTravelTest.Tokens.ReleaseTest do
 
       TokenFactory.create_tokens(3, state: :available)
 
-      # Get initial counts (accounting for any existing tokens)
       initial_available = Tokens.count_available_tokens()
 
       assert {:ok, cleared_count} = Tokens.clear_all_active_tokens()
       assert cleared_count >= 5
 
-      # All should be available now
+      # All should be available
       assert Tokens.count_active_tokens() == 0
       assert Tokens.count_available_tokens() >= initial_available + cleared_count
 
-      # Verify all our created tokens are released
+      # Verify all created tokens are released
       Enum.each(active_tokens, fn token ->
         released = Tokens.get_token_by_id(token.id)
         assert released.state == :available

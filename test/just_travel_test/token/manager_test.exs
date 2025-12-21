@@ -7,14 +7,14 @@ defmodule JustTravelTest.Tokens.ManagerTest do
 
   setup do
     # Manager is already started by the application supervisor
-    # We just need to ensure it's running
+    # just need to ensure it's running
     :ok
   end
 
   describe "check_and_release_expired/0" do
     test "releases expired tokens" do
-      # Create expired tokens (activated well past the configured lifetime)
-      # Config is 1 minute for tests, so use 65 seconds to ensure they're definitely expired
+      # Create expired tokens
+      # Config is 1 minute for tests, so I am using 65 seconds to ensure they're definitely expired
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
@@ -33,7 +33,6 @@ defmodule JustTravelTest.Tokens.ManagerTest do
           activated_at: expired_time
         )
 
-      # Create usage records
       TokenFactory.create_token_usage(
         token_id: expired1.id,
         user_id: user1,
@@ -46,7 +45,7 @@ defmodule JustTravelTest.Tokens.ManagerTest do
         started_at: expired2.activated_at
       )
 
-      # Create active token (not expired)
+      # Create active token
       active_user_id = TokenFactory.user_uuid()
 
       active_token =
@@ -56,14 +55,13 @@ defmodule JustTravelTest.Tokens.ManagerTest do
           activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
         )
 
-      # Create usage record for active token
       TokenFactory.create_token_usage(
         token_id: active_token.id,
         user_id: active_user_id,
         started_at: active_token.activated_at
       )
 
-      # Wait a moment to ensure time has passed
+      # Wait to ensure time has passed
       Process.sleep(100)
 
       # Manually trigger check
@@ -89,18 +87,14 @@ defmodule JustTravelTest.Tokens.ManagerTest do
 
   describe "periodic expiration check" do
     test "automatically releases expired tokens" do
-      # Create expired token
       expired_token = TokenFactory.create_expired_token()
 
-      # Wait for periodic check (with a small buffer)
-      # Note: In real tests, you might want to use a shorter check interval
-      # or manually trigger the check
+      # Wait for periodic check
       Process.sleep(100)
 
       # Manually trigger to simulate periodic check
       Manager.check_and_release_expired()
 
-      # Token should be released
       released = Tokens.get_token_by_id(expired_token.id)
       assert released.state == :available
     end

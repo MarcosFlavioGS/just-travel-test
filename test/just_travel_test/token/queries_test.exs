@@ -58,7 +58,7 @@ defmodule JustTravelTest.Tokens.QueriesTest do
       assert length(available) >= 3
       assert Enum.all?(available, &(&1.state == :available))
 
-      # Verify our created tokens are in the list
+      # Verify created tokens are in the list
       available_ids = Enum.map(available, & &1.id)
       assert Enum.all?(created_ids, &(&1 in available_ids))
 
@@ -72,7 +72,6 @@ defmodule JustTravelTest.Tokens.QueriesTest do
     test "returns only active tokens" do
       TokenFactory.create_tokens(3, state: :available)
 
-      # Create active tokens with proper user_ids
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
 
@@ -105,7 +104,6 @@ defmodule JustTravelTest.Tokens.QueriesTest do
       assert length(active) >= 2
       assert Enum.all?(active, &(&1.state == :active))
 
-      # Verify our created tokens are in the list
       created_ids = Enum.map(active_tokens, & &1.id)
       active_ids = Enum.map(active, & &1.id)
       assert Enum.all?(created_ids, &(&1 in active_ids))
@@ -176,7 +174,6 @@ defmodule JustTravelTest.Tokens.QueriesTest do
           activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
         )
 
-      # Create usage record
       TokenFactory.create_token_usage(
         token_id: token.id,
         user_id: user_id,
@@ -211,7 +208,6 @@ defmodule JustTravelTest.Tokens.QueriesTest do
           )
         end)
 
-      # Create usage records for active tokens
       Enum.each(Enum.zip(active_tokens, users), fn {token, user_id} ->
         TokenFactory.create_token_usage(
           token_id: token.id,

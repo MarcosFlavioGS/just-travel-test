@@ -6,7 +6,6 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
 
   describe "register_token_usage/1" do
     test "successfully activates an available token" do
-      # Create an available token
       token = TokenFactory.create_token(state: :available)
 
       user_id = TokenFactory.user_uuid()
@@ -35,7 +34,6 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
     end
 
     test "releases oldest active token when limit is reached" do
-      # Clear all tokens first to avoid seed data interference
       Tokens.clear_all_active_tokens()
 
       # Create exactly 100 active tokens with different activation times
@@ -63,7 +61,6 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
       # Create one available token
       _available_token = TokenFactory.create_token(state: :available)
 
-      # Verify we have exactly 100 active tokens
       assert Tokens.count_active_tokens() == 100
 
       # Try to activate a new token (should release oldest)
@@ -72,7 +69,6 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
       assert {:ok, %{token_id: token_id, user_id: ^new_user_id}} =
                Tokens.register_token_usage(new_user_id)
 
-      # The new token should be activated (could be the available one or another)
       assert token_id != nil
 
       # The oldest token should be released
@@ -88,13 +84,12 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
     end
 
     test "handles concurrent activation requests" do
-      # Clear all tokens first to avoid seed data interference
       Tokens.clear_all_active_tokens()
 
       # Create 10 available tokens (enough for all concurrent requests)
       TokenFactory.create_tokens(10, state: :available)
 
-      # Simulate concurrent requests
+      # concurrent requests
       user_ids = Enum.map(1..10, fn _ -> TokenFactory.user_uuid() end)
 
       results =
@@ -106,8 +101,6 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
         |> Enum.to_list()
 
       # All should succeed (some may have triggered oldest token release)
-      # Task.async_stream returns {:ok, result} or {:error, reason}
-      # The result from register_token_usage is already {:ok, ...}, so it gets double-wrapped
       assert Enum.all?(results, fn
                {:ok, {:ok, _}} -> true
                {:ok, {:error, _}} -> false
@@ -115,7 +108,6 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
                _ -> false
              end)
 
-      # Verify all succeeded
       successful =
         Enum.count(results, fn
           {:ok, {:ok, _}} -> true
@@ -124,7 +116,7 @@ defmodule JustTravelTest.Tokens.RegistrationTest do
 
       assert successful == length(user_ids)
 
-      # Should have exactly 10 active tokens (we created 10 available and activated 10)
+      # Should have exactly 10 active tokens
       assert Tokens.count_active_tokens() == 10
     end
 

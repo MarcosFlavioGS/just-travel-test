@@ -6,8 +6,7 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
 
   describe "find_expired_tokens/0" do
     test "finds tokens activated more than the configured lifetime ago" do
-      # Create expired token (activated well past the configured lifetime threshold)
-      # Config is 1 minute for tests, so use 65 seconds (1 minute 5 seconds) to ensure it's definitely expired
+      # Create expired token
       user_id = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
 
@@ -23,18 +22,15 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
       alias JustTravelTest.Token.TokenSchema
       expired_token = Repo.get!(TokenSchema, expired_token.id)
 
-      # Verify token is active and has the correct activated_at
       assert expired_token.state == :active
       assert expired_token.activated_at == expired_time
 
-      # Create usage record
       TokenFactory.create_token_usage(
         token_id: expired_token.id,
         user_id: user_id,
         started_at: expired_token.activated_at
       )
 
-      # Create active token (not expired - activated now)
       active_user_id = TokenFactory.user_uuid()
 
       active_token =
@@ -44,14 +40,13 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
           activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
         )
 
-      # Create usage record for active token
       TokenFactory.create_token_usage(
         token_id: active_token.id,
         user_id: active_user_id,
         started_at: active_token.activated_at
       )
 
-      # Wait a moment to ensure time has passed and query is fresh
+      # Wait ensure time has passed and query is fresh
       Process.sleep(100)
 
       expired = Tokens.find_expired_tokens()
@@ -70,8 +65,7 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
 
   describe "release_expired_tokens/0" do
     test "releases all expired tokens" do
-      # Create expired tokens (activated well past the configured lifetime)
-      # Config is 1 minute for tests, so use 65 seconds to ensure they're definitely expired
+      # Create expired tokens
       user1 = TokenFactory.user_uuid()
       user2 = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
@@ -90,7 +84,6 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
           activated_at: expired_time
         )
 
-      # Create usage records
       TokenFactory.create_token_usage(
         token_id: expired1.id,
         user_id: user1,
@@ -103,7 +96,6 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
         started_at: expired2.activated_at
       )
 
-      # Create active token (not expired)
       active_user_id = TokenFactory.user_uuid()
 
       active_token =
@@ -113,14 +105,12 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
           activated_at: DateTime.utc_now() |> DateTime.truncate(:second)
         )
 
-      # Create usage record for active token
       TokenFactory.create_token_usage(
         token_id: active_token.id,
         user_id: active_user_id,
         started_at: active_token.activated_at
       )
 
-      # Wait a moment to ensure time has passed
       Process.sleep(100)
 
       assert {:ok, 2} = Tokens.release_expired_tokens()
@@ -137,8 +127,6 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
     end
 
     test "closes usage records for expired tokens" do
-      # Create expired token (activated well past the configured lifetime)
-      # Config is 1 minute for tests, so use 65 seconds to ensure it's definitely expired
       user_id = TokenFactory.user_uuid()
       expired_time = DateTime.add(DateTime.utc_now(), -65, :second) |> DateTime.truncate(:second)
 
@@ -149,14 +137,12 @@ defmodule JustTravelTest.Tokens.ExpirationTest do
           activated_at: expired_time
         )
 
-      # Create usage record
       TokenFactory.create_token_usage(
         token_id: expired_token.id,
         user_id: user_id,
         started_at: expired_token.activated_at
       )
 
-      # Wait a moment to ensure time has passed
       Process.sleep(100)
 
       assert {:ok, 1} = Tokens.release_expired_tokens()

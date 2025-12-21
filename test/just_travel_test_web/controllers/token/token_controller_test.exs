@@ -64,7 +64,6 @@ defmodule JustTravelTestWeb.Token.TokenControllerTest do
       # Create one available token
       _available_token = TokenFactory.create_token(state: :available)
 
-      # Verify we have exactly 100 active tokens
       assert Tokens.count_active_tokens() == 100
 
       new_user_id = TokenFactory.user_uuid()
